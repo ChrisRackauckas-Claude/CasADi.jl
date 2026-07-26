@@ -28,7 +28,7 @@ function Base.getindex(
 end
 
 function Base.setindex!(
-        x::CasadiSymbolicObject, v::Number, j::Union{
+        x::CasadiSymbolicObject, v::Union{Number, CasadiSymbolicObject}, j::Union{
             Int, UnitRange{Int}, Colon,
         }
     )
@@ -38,18 +38,19 @@ end
 
 function Base.setindex!(
         x::CasadiSymbolicObject,
-        v::Number,
+        v::Union{Number, CasadiSymbolicObject},
         j1::Union{Int, UnitRange{Int}, Colon},
         j2::Union{Int, UnitRange{Int}, Colon}
     )
     (m, n) = size(x)
     J1 = j1 isa Int ? (j1:j1) : j1
     J2 = j2 isa Int ? (j2:j2) : j2
-    return pysetitem(
+    pysetitem(
         x.x, (
             (1:m)[j1 isa Int ? (j1:j1) : j1] .- 1, (1:n)[j2 isa Int ? (j2:j2) : j2] .- 1,
         ), v
     )
+    return x
 end
 
 Base.lastindex(x::CasadiSymbolicObject) = length(x)
@@ -101,6 +102,10 @@ function Base.size(x::C, j::Integer) where {C <: CasadiSymbolicObject}
     end
 end
 Base.length(x::C) where {C <: CasadiSymbolicObject} = pyconvert(Int, x.numel())
+Base.Broadcast.broadcastable(x::CasadiSymbolicObject) = Ref(x)
+Base.eltype(::Type{C}) where {C <: CasadiSymbolicObject} = C
+symmetric(x::C, ::Symbol = :U) where {C <: CasadiSymbolicObject} = x
+symmetric_type(::Type{C}) where {C <: CasadiSymbolicObject} = C
 
 ## Concatenations
 Base.hcat(x::Vector{T}) where {T <: CasadiSymbolicObject} = T(casadi.hcat(x))
@@ -158,18 +163,4 @@ function Base.:\(A::Matrix{N}, b::Matrix{C}) where {
         C <: CasadiSymbolicObject, N <: Number,
     }
     return Matrix(C(casadi.solve(C(A), C(b))))
-end
-
-function SymbolicUtils.Code.create_array(
-        ::Type{T}, ::Nothing, ::Val{1}, ::Val{dims},
-        elems...
-    ) where {T <: CasadiSymbolicObject, dims}
-    return T([elems...])
-end
-
-function SymbolicUtils.Code.create_array(
-        ::Type{C}, T, ::Val{1}, ::Val{dims},
-        elems...
-    ) where {C <: CasadiSymbolicObject, dims}
-    return C(T[elems...])
 end

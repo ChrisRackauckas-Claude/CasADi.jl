@@ -126,7 +126,7 @@ end
 PythonCall.Py(x::CasadiSymbolicObject) = x.x
 PythonCall.pyconvert(::Type{T}, x::Py) where {T <: CasadiSymbolicObject} = T(x)
 
-Base.show(io::IO, c::CasadiSymbolicObject) = print(io, pycall(pybuiltins.str, c.x))
+Base.show(io::IO, c::CasadiSymbolicObject) = print(io, pystr(c.x))
 _tonparr(a::AbstractArray) = Py(a).__array__()
 
 ## text/plain

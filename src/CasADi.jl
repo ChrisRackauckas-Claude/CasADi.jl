@@ -1,14 +1,14 @@
 module CasADi
 
 import PythonCall
-using PythonCall: Py, PyDict, pybuiltins, pycall, pyconvert, pygetitem, pyimport, pyrowlist,
+using PythonCall: Py, PyDict, pyconvert, pygetitem, pyimport, pyrowlist,
+    pystr,
     pysetitem
-import SymbolicUtils
 
 import Base: convert, getproperty, hash, length, promote_rule, size, vcat
 import Base: +, -, *, /, \, ^
 import Base: >, >=, <, <=, ==
-import LinearAlgebra: ×
+import LinearAlgebra: symmetric, symmetric_type, ×
 
 export CasadiSymbolicObject, SX, MX, DM
 export casadi, to_julia, substitute

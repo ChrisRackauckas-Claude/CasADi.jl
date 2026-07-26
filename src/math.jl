@@ -192,8 +192,12 @@ function substitute(
         vars, vals
     ) where {C <: CasadiSymbolicObject}
     v = if (vars isa AbstractMatrix{C} && vals isa AbstractMatrix) ||
-            (vars isa AbstractVector{C}) || (vars isa C && vals isa Number)
-        casadi.substitute(C(ex), C(vars), C(vals))
+            (vars isa AbstractVector{C}) ||
+            (vars isa C && vals isa Union{C, Number})
+        symbolic_ex = ex isa C ? ex : C(ex)
+        symbolic_vars = vars isa C ? vars : C(vars)
+        symbolic_vals = vals isa C ? vals : C(vals)
+        casadi.substitute(symbolic_ex, symbolic_vars, symbolic_vals)
     else
         error()
     end
