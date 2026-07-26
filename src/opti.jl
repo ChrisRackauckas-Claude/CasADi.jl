@@ -42,6 +42,11 @@ Create a CasADi `MX` decision variable in `opti`.
 Pass no dimensions for a scalar variable, one dimension for a vector, or two
 dimensions for a matrix.
 
+# Arguments
+
+- `opti`: optimization problem receiving the decision variable.
+- `dims`: zero, one, or two nonnegative dimensions.
+
 # Examples
 
 ```julia
@@ -65,6 +70,11 @@ Create a CasADi `MX` parameter in `opti`.
 Parameters are symbolic inputs whose numeric values can be assigned with
 [`set_value!`](@ref) before solving.
 
+# Arguments
+
+- `opti`: optimization problem receiving the parameter.
+- `dims`: zero, one, or two nonnegative dimensions.
+
 # Examples
 
 ```julia
@@ -84,6 +94,12 @@ end
 
 Set the numeric value of parameter `p` in `opti`.
 
+# Arguments
+
+- `opti`: optimization problem containing `p`.
+- `p`: parameter created by [`parameter!`](@ref).
+- `val`: numeric value with dimensions compatible with `p`.
+
 # Examples
 
 ```julia
@@ -102,6 +118,12 @@ end
     set_initial!(opti::Opti, x::MX, val)
 
 Set the initial guess for decision variable `x` in `opti`.
+
+# Arguments
+
+- `opti`: optimization problem containing `x`.
+- `x`: decision variable created by [`variable!`](@ref).
+- `val`: numeric initial value with dimensions compatible with `x`.
 
 # Examples
 
@@ -124,6 +146,11 @@ Add constraint expression `expr` to `opti`.
 
 The expression is usually built from `MX` variables and relational operators.
 
+# Arguments
+
+- `opti`: optimization problem receiving the constraint.
+- `expr`: scalar, vector, or matrix CasADi relational expression.
+
 # Examples
 
 ```julia
@@ -142,6 +169,11 @@ end
     minimize!(opti::Opti, expr::MX)
 
 Set the scalar objective expression minimized by `opti`.
+
+# Arguments
+
+- `opti`: optimization problem receiving the objective.
+- `expr`: scalar `MX` objective expression.
 
 # Examples
 
@@ -165,6 +197,13 @@ Configure the CasADi solver plugin used by `opti`.
 Nested dictionaries in `solver_options` are converted to Python dictionaries
 before calling CasADi.
 
+# Arguments
+
+- `opti`: optimization problem to configure.
+- `solver`: installed CasADi solver plugin name.
+- `plugin_options`: CasADi-level solver options.
+- `solver_options`: plugin-specific options.
+
 # Examples
 
 ```julia
@@ -186,6 +225,10 @@ end
 
 Solve the optimization problem stored in `opti` and return an internal solution
 object accepted by [`value`](@ref).
+
+# Arguments
+
+- `opti`: fully specified optimization problem with a configured solver.
 
 # Examples
 
@@ -212,6 +255,11 @@ Evaluate expression `expr` at a solution returned by [`solve!`](@ref).
 
 The result is converted to a Julia scalar, vector, or matrix with
 [`to_julia`](@ref).
+
+# Arguments
+
+- `sol`: solution returned by [`solve!`](@ref).
+- `expr`: `MX` expression to evaluate at `sol`.
 
 # Examples
 
@@ -240,6 +288,10 @@ end
     return_status(opti::Opti)
 
 Return CasADi's solver status string for `opti`.
+
+# Arguments
+
+- `opti`: optimization problem that has been solved with [`solve!`](@ref).
 
 # Examples
 
@@ -270,9 +322,9 @@ function Base.getproperty(opti::Opti, sym::Symbol)
     elseif sym == :nx
         pyconvert(Int, getfield(opti, :py).nx)
     elseif sym == :np
-        pyconvert(Int, getfield(opti.py).np)
+        pyconvert(Int, getfield(opti, :py).np)
     elseif sym == :ng
-        pyconvert(Int, getfield(opti.py).ng)
+        pyconvert(Int, getfield(opti, :py).ng)
     elseif sym == :py
         getfield(opti, :py)
     else

@@ -26,23 +26,56 @@ end
 function +(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.plus(x, _float_if_irrational(y)))
 end
+function +(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.plus(x, y))
+end
+function +(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.plus(_float_if_irrational(x), y))
+end
 function -(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.minus(x, _float_if_irrational(y)))
+end
+function -(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.minus(x, y))
+end
+function -(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.minus(_float_if_irrational(x), y))
 end
 function /(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.mrdivide(x, _float_if_irrational(y)))
 end
+function /(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.mrdivide(x, y))
+end
+function /(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.mrdivide(_float_if_irrational(x), y))
+end
 function ^(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.power(x, _float_if_irrational(y)))
 end
-function ^(x::C, y::Integer) where {C <: CasadiSymbolicObject}
-    return C(casadi.power(x, _float_if_irrational(y)))
+function ^(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.power(x, y))
+end
+function ^(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.power(_float_if_irrational(x), y))
 end
 function \(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.solve(x, _float_if_irrational(y)))
 end
+function \(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.solve(x, y))
+end
+function \(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.solve(_float_if_irrational(x), y))
+end
 function ×(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.cross(x, _float_if_irrational(y)))
+end
+function ×(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.cross(x, y))
+end
+function ×(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.cross(_float_if_irrational(x), y))
 end
 
 _float_if_irrational(x::Real) = x isa Irrational ? float(x) : x
@@ -56,23 +89,71 @@ function *(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(v)
 end
 
+function *(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    v = if size(x, 2) == size(y, 1)
+        casadi.mtimes(x, y)
+    else
+        casadi.times(x, y)
+    end
+    return C(v)
+end
+
+function *(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    v = if size(x, 2) == size(y, 1)
+        casadi.mtimes(_float_if_irrational(x), y)
+    else
+        casadi.times(_float_if_irrational(x), y)
+    end
+    return C(v)
+end
+
 *(x::AbstractArray{<:Real}, y::C) where {C <: CasadiSymbolicObject} = C(x) * y
 *(x::C, y::AbstractArray{<:Real}) where {C <: CasadiSymbolicObject} = x * C(y)
 
 function >=(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.ge(x, _float_if_irrational(y)))
 end
+function >=(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.ge(x, y))
+end
+function >=(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.ge(_float_if_irrational(x), y))
+end
 function >(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.gt(x, _float_if_irrational(y)))
+end
+function >(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.gt(x, y))
+end
+function >(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.gt(_float_if_irrational(x), y))
 end
 function <=(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.le(x, _float_if_irrational(y)))
 end
+function <=(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.le(x, y))
+end
+function <=(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.le(_float_if_irrational(x), y))
+end
 function <(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.lt(x, _float_if_irrational(y)))
 end
+function <(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.lt(x, y))
+end
+function <(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.lt(_float_if_irrational(x), y))
+end
 function ==(x::C, y::Real) where {C <: CasadiSymbolicObject}
     return C(casadi.eq(x, _float_if_irrational(y)))
+end
+function ==(x::C, y::D) where {C <: CasadiSymbolicObject, D <: CasadiSymbolicObject}
+    return C(casadi.eq(x, y))
+end
+function ==(x::Real, y::C) where {C <: CasadiSymbolicObject}
+    return C(casadi.eq(_float_if_irrational(x), y))
 end
 
 function Base.isequal(x::C, y::C) where {C <: CasadiSymbolicObject}
@@ -89,6 +170,12 @@ Substitute CasADi symbolic variables `vars` in expression `ex` with values
 
 `ex` can be a scalar, vector, or matrix of a single CasADi wrapper type. The
 result has the same wrapper type as `ex`.
+
+# Arguments
+
+- `ex`: the symbolic expression or collection of expressions to transform.
+- `vars`: a wrapper or collection of wrappers to replace.
+- `vals`: numeric or symbolic replacement values with CasADi-compatible dimensions.
 
 # Examples
 

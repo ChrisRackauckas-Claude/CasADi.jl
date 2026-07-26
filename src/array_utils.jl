@@ -148,13 +148,13 @@ function Base.:\(A::Matrix{C}, b::Vector{C}) where {C <: CasadiSymbolicObject}
     return Vector(C(casadi.solve(C(A), C(b))))
 end
 
-function Base.:\(A::AbstractMatrix{C}, b::AbstractMatrix{N}) where {
+function Base.:\(A::Matrix{C}, b::Matrix{N}) where {
         C <: CasadiSymbolicObject, N <: Number,
     }
     return Matrix(C(casadi.solve(C(A), C(b))))
 end
 
-function Base.:\(A::AbstractMatrix{N}, b::AbstractMatrix{C}) where {
+function Base.:\(A::Matrix{N}, b::Matrix{C}) where {
         C <: CasadiSymbolicObject, N <: Number,
     }
     return Matrix(C(casadi.solve(C(A), C(b))))

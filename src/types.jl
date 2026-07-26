@@ -1,13 +1,31 @@
 """
     CasadiSymbolicObject
 
-Abstract supertype for Julia wrappers around CasADi symbolic and numeric objects.
+Abstract interface for Julia wrappers around CasADi symbolic and numeric objects.
 
-Subtypes such as [`SX`](@ref), [`MX`](@ref), and [`DM`](@ref) hold the underlying
-Python CasADi object and participate in Julia arithmetic by forwarding operations
-to CasADi.
+`CasadiSymbolicObject` is intentionally not a subtype of `Number` or `Real`:
+comparisons such as `x == y` produce a symbolic CasADi expression instead of a
+Julia `Bool`. Subtypes such as [`SX`](@ref), [`MX`](@ref), and [`DM`](@ref) hold
+the underlying Python CasADi object and participate in Julia arithmetic by
+forwarding operations to CasADi.
+
+# Interface
+
+Packages extending this interface must provide a wrapper type `T` with an `x`
+property containing a `PythonCall.Py` CasADi expression and a constructor
+`T(::PythonCall.Py)`. The generic array, arithmetic, conversion, and
+[`to_julia`](@ref) methods call those two operations and return the left-hand
+wrapper type for symbolic results. The wrapped Python object must implement the
+standard CasADi symbolic-object operations used by those methods, including
+indexing, `size1`, `size2`, `numel`, and the corresponding CasADi arithmetic.
+
+The interface guarantees symbolic expressions, not Julia scalar semantics: use
+[`to_julia`](@ref) only after an expression is numerically evaluable. Do not
+extend `Base` operations for `CasadiSymbolicObject` outside CasADi.jl; add a
+method on the concrete wrapper type instead when an external CasADi object has
+different behavior.
 """
-abstract type CasadiSymbolicObject <: Real end
+abstract type CasadiSymbolicObject end
 
 """
     SX(x)
@@ -21,6 +39,12 @@ Wrapper for CasADi `SX` symbolic expressions.
 Use `SX(name)` and its dimensioned forms to create scalar, vector, or matrix
 symbolic variables. Numeric scalars and numeric vectors or matrices construct
 constant `SX` values.
+
+# Arguments
+
+- `x`: a Python CasADi `SX` object, numeric scalar, numeric vector or matrix, or
+  symbolic variable name.
+- `n`, `m`: nonnegative symbolic-variable dimensions when constructing from a name.
 
 # Examples
 
@@ -50,6 +74,12 @@ Use `MX(name)` and its dimensioned forms to create scalar, vector, or matrix
 symbolic variables. Numeric scalars and numeric vectors or matrices construct
 constant `MX` values.
 
+# Arguments
+
+- `x`: a Python CasADi `MX` object, numeric scalar, numeric vector or matrix, or
+  symbolic variable name.
+- `n`, `m`: nonnegative symbolic-variable dimensions when constructing from a name.
+
 # Examples
 
 ```julia
@@ -73,6 +103,11 @@ Wrapper for CasADi dense numeric matrices.
 Use `DM` for concrete numeric CasADi values. Numeric scalars and numeric vectors
 or matrices construct populated `DM` values, while `DM(n, m)` constructs an
 `n` by `m` CasADi dense matrix.
+
+# Arguments
+
+- `x`: a Python CasADi `DM` object, numeric scalar, numeric vector, or numeric matrix.
+- `n`, `m`: nonnegative matrix dimensions for an uninitialized dense matrix.
 
 # Examples
 
@@ -142,6 +177,11 @@ matrix of `Float64` values.
 
 Scalar CasADi values return a `Float64`, column vectors return `Vector{Float64}`,
 and other matrices return `Matrix{Float64}`.
+
+# Arguments
+
+- `x`: a numerically evaluable `CasadiSymbolicObject`; free symbolic variables are
+  rejected by CasADi.
 
 # Examples
 
