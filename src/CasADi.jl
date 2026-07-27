@@ -1,12 +1,14 @@
 module CasADi
 
-using PythonCall
-using SymbolicUtils
+import PythonCall
+using PythonCall: Py, PyDict, pyconvert, pygetitem, pyimport, pyrowlist,
+    pystr,
+    pysetitem
 
-import Base: convert, getproperty, hcat, length, promote_rule, show, size, vcat, hash
+import Base: convert, getproperty, hash, length, promote_rule, size, vcat
 import Base: +, -, *, /, \, ^
 import Base: >, >=, <, <=, ==
-import LinearAlgebra: ×
+import LinearAlgebra: symmetric, symmetric_type, ×
 
 export CasadiSymbolicObject, SX, MX, DM
 export casadi, to_julia, substitute
@@ -30,6 +32,15 @@ PythonCall handle for the imported Python `casadi` module.
 Most users should prefer the Julia wrappers such as [`SX`](@ref), [`MX`](@ref),
 [`DM`](@ref), [`nlpsol`](@ref), and [`Opti`](@ref). Access `casadi` directly
 when a lower-level Python CasADi function is not wrapped yet.
+
+# Examples
+
+```julia
+using CasADi
+
+py_x = casadi.SX.sym("x")
+SX(py_x)
+```
 """
 const casadi = PythonCall.pynew()
 function __init__()

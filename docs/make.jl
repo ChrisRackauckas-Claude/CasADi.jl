@@ -5,7 +5,7 @@ makedocs(
     sitename = "CasADi.jl",
     modules = [CasADi],
     checkdocs = :exports,
-    doctest = false,
+    doctest = true,
     linkcheck = false,
     format = Documenter.HTML(
         canonical = "https://docs.sciml.ai/CasADi/stable/"
